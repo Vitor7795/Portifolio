@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050b20">
+  <title>AUREON Design System</title>
+  <link rel="stylesheet" href="assets/aureon-fonts.css">
+  <link rel="stylesheet" href="assets/aureon-source.css">
+  <style>
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    .site-header {
+      position: relative;
+      inset: auto;
+    }
+    .catalog-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .catalog-divider {
+      color: var(--line);
+      font-size: 14px;
+      user-select: none;
+    }
+    .explore-link {
+      color: var(--muted);
+      transition: color .2s;
+    }
+    .explore-link.is-active,
+    .explore-link:not(.is-disabled):hover {
+      color: var(--ink);
+    }
+    .explore-link.is-disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+    .catalog-stage {
+      width: 100%;
+      height: calc(100vh - 76px);
+      height: calc(100dvh - 76px);
+    }
+    .overview-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: var(--bg);
+    }
+    .components-view[hidden],
+    .overview-frame[hidden] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner shell">
+      <a class="brand" href="#overview" aria-label="AUREON Design System">
+        <span class="brand-dot"></span>AUREON
+      </a>
+      <p class="header-manifesto">DESIGN SYSTEM</p>
+      <div class="header-actions">
+        <nav class="catalog-tabs" aria-label="Catalog views">
+          <a class="explore-link is-active" href="#overview" data-view="overview" aria-current="page">
+            <i class="status-dot" aria-hidden="true"></i>Overview
+          </a>
+          <span class="catalog-divider" aria-hidden="true">|</span>
+          <button type="button" class="explore-link is-disabled" data-view="components" disabled aria-disabled="true" title="Available after Overview approval">
+            Components
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="catalog-stage">
+    <iframe
+      id="overview-frame"
+      class="overview-frame"
+      src="assets/overview/index.html"
+      title="AUREON Design System Overview"
+      allow="fullscreen"
+    ></iframe>
+    <section id="components-view" class="components-view" hidden></section>
+  </main>
+
+  <script>
+    (function () {
+      var overviewTab = document.querySelector('[data-view="overview"]');
+      var componentsTab = document.querySelector('[data-view="components"]');
+      var overviewFrame = document.getElementById('overview-frame');
+      var componentsView = document.getElementById('components-view');
+
+      function syncRoute() {
+        var componentsEnabled = !componentsTab.disabled;
+        var hash = window.location.hash;
+        if (hash === '#components' && componentsEnabled) {
+          overviewFrame.hidden = true;
+          componentsView.hidden = false;
+          overviewTab.classList.remove('is-active');
+          overviewTab.removeAttribute('aria-current');
+          componentsTab.classList.add('is-active');
+          componentsTab.setAttribute('aria-current', 'page');
+          return;
+        }
+        if (hash !== '#overview') {
+          try {
+            history.replaceState(null, '', '#overview');
+          } catch (err) {
+            window.location.hash = '#overview';
+          }
+        }
+        overviewFrame.hidden = false;
+        componentsView.hidden = true;
+        overviewTab.classList.add('is-active');
+        overviewTab.setAttribute('aria-current', 'page');
+        componentsTab.classList.remove('is-active');
+        componentsTab.removeAttribute('aria-current');
+      }
+
+      window.addEventListener('hashchange', syncRoute);
+      syncRoute();
+    })();
+  </script>
+</body>
+</html>
